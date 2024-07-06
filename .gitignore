@@ -1,0 +1,9 @@
+.env.*.local
+.idea
+vendor
+.env.local
+coverage
+__debug*
+.DS_Store
+.env
+build

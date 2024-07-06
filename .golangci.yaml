@@ -1,0 +1,162 @@
+linters-settings:
+  depguard:
+    rules:
+      main:
+        allow:
+          - "$gostd"
+          - "github.com"
+  dupl:
+    threshold: 100
+  forbidigo:
+    forbid:
+      - p: "^(fmt\\.Print(|f|ln)|print|println)$"
+        msg: Do not commit print statements [DEFAULT].
+      - p: ^log\.Fatal.*$
+        msg: Do not commit fatal statements.
+  funlen:
+    lines: 100
+    statements: 50
+  goconst:
+    min-len: 2
+    min-occurrences: 3
+  gocritic:
+    enabled-checks:
+      - deferInLoop
+      - deferUnlambda
+      - dupImport
+      - emptyFallthrough
+      - emptyStringTest
+      - octalLiteral
+    disabled-checks:
+      - exitAfterDefer
+  gocyclo:
+    min-complexity: 15
+  gofmt:
+    rewrite-rules:
+      - pattern: "interface{}"
+        replacement: "any"
+      - pattern: "a[b:len(a)]"
+        replacement: "a[b:]"
+  govet:
+    settings:
+      shadow:
+        strict: true
+    enable-all: true
+    disable:
+      - fieldalignment
+  lll:
+    line-length: 160
+    tab-width: 4
+  misspell:
+    locale: US
+  nolintlint:
+    allow-unused: false
+    require-explanation: false
+    require-specific: true
+  tagalign:
+    align: true
+    sort: true
+    order:
+      - json #json tag first, other tags alphabetically
+    strict: true
+  testifylint:
+    enable-all: true
+  usestdlibvars:
+    time-month: true
+    time-layout: true
+    crypto-hash: true
+    default-rpc-path: true
+    sql-isolation-level: true
+    tls-signature-scheme: true
+    constant-kind: true
+
+# Excluding configuration per-path, per-linter, per-text and per-source
+issues:
+  exclude-rules:
+    - path: _test\.go
+      linters:
+        - wrapcheck
+        - errcheck
+        - forbidigo
+    - path: internal/queue/handler/payment.go
+      linters: # @TODO remove after IA-486
+        - revive
+        - mnd
+        - unparam
+
+linters:
+  disable-all: true
+  enable:
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - depguard
+    - dogsled
+    - dupword
+    - durationcheck
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - forcetypeassert
+    - forbidigo
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gocognit
+    - goconst
+    - gocritic
+    - gofmt
+    - gofumpt
+    - mnd
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - importas
+    - inamedparam
+    - ineffassign
+    - lll
+    - loggercheck
+    - makezero
+    - mirror
+    - misspell
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    - noctx
+    - nolintlint
+    - nosprintfhostport
+    - perfsprint
+    - prealloc
+    - predeclared
+    - protogetter
+    - reassign
+    - revive
+    - rowserrcheck
+    - sloglint
+    - sqlclosecheck
+    - staticcheck
+    - stylecheck
+    - tagalign
+    - tenv
+    - testableexamples
+    - testifylint
+    - thelper
+    - tparallel
+    - typecheck
+    - unconvert
+    - unparam
+    - unused
+    - usestdlibvars
+    - whitespace
+    - zerologlint
+
+run:
+  allow-parallel-runners: true
+  timeout: 5m
