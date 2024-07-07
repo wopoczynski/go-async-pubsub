@@ -1,9 +1,9 @@
-# Go playground
+# Go dummy pub sub on rabbitmq
 
 ## Name
 
-Go playground reminding old stuff
+reminding old stuff fixing go skill issues
 
 ## Description
 
-Reminding old stuff did in the past like algorithms, data structures and such
+Reminding old stuff did in the past -> async pubsub with cache data on redis + mysql dummy model persist
