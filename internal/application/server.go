@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"sync"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -24,7 +25,7 @@ type Config struct {
 	Http  *server.ServerConfig     `env:", prefix=HTTP_"`
 	DB    *initialize.DBConfig     `env:", prefix=DB_"`
 	Redis *initialize.RedisConfig  `env:", prefix=REDIS_"`
-	AMQP  *initialize.RabbitConfig `env:", prefix=QUEUE_"`
+	AMQP  *initialize.RabbitConfig `env:", prefix=AMQP_"`
 }
 
 type ApplicationContainer struct {
@@ -49,11 +50,26 @@ func New(cfg Config) (*ApplicationContainer, error) {
 	if err != nil {
 		return nil, fmt.Errorf("amqp initialize error: %w", err)
 	}
+
+	var wg sync.WaitGroup
+	for range cfg.AMQP.WorkersNumber {
+		wg.Add(1)
+		go func() {
+			amqp.Consume(cfg.AMQP.Queue)
+			wg.Done()
+		}()
+	}
+
+	handler := server.NewHandler(*amqp, cfg.AMQP.Queue)
+
+	server := server.New(cfg.Http, handler)
+
 	return &ApplicationContainer{
-		cfg:   &cfg,
-		db:    db,
-		cache: cache,
-		amqp:  amqp,
+		cfg:    &cfg,
+		db:     db,
+		cache:  cache,
+		amqp:   amqp,
+		server: server,
 	}, nil
 }
 
@@ -73,6 +89,8 @@ func (s *ApplicationContainer) Start(ctx context.Context) {
 	signal.Notify(quit, os.Interrupt)
 
 	<-quit
+	defer s.amqp.Connection.Close()
+	defer s.amqp.Ch.Close()
 
 	const shutdownTimeout = 10 * time.Second
 	ctx, cancel := context.WithTimeout(ctx, shutdownTimeout)

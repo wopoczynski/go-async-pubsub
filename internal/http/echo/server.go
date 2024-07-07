@@ -21,7 +21,7 @@ type Server interface {
 
 var _ Server = (*echo.Echo)(nil)
 
-func New(c *ServerConfig) Server {
+func New(c *ServerConfig, h *Handler) Server {
 	e := echo.New()
 	e.HideBanner = c.HideBanner
 	e.Use(middleware.Recover())
@@ -43,6 +43,7 @@ func New(c *ServerConfig) Server {
 		},
 	}))
 	e.GET("/", ping)
+	e.POST("/messages", h.message)
 
 	return e
 }

@@ -34,4 +34,6 @@ func (a *AMQP) Publish(m *Message) {
 	if err != nil {
 		log.Error().Err(err).Msg("message not published")
 	}
+
+	log.Info().Msgf("pushed message :%s to queue: %s", m.Body, m.QueueName)
 }

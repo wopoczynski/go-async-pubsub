@@ -9,7 +9,7 @@ services:
     ports:
       - 3306:3306
     volumes:
-      - db:/var/lib/mysql
+      - app-db:/var/lib/mysql
   rabbitmq:
     image: rabbitmq:management
     environment:
@@ -19,10 +19,10 @@ services:
       - 5672:5672
       - 15672:15672
   redis:
-    image: redis:alpine
+    image: redis
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
+    - ALLOW_EMPTY_PASSWORD=yes
     ports:
       - 6379:6379
 volumes:
-  db:
+  app-db:

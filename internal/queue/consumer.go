@@ -2,6 +2,7 @@ package queue
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/google/uuid"
 	"github.com/rs/zerolog/log"
@@ -38,16 +39,27 @@ func (a *AMQP) Consume(queueName string) {
 	go func() {
 		ctx := context.Background()
 		for d := range msgs {
-			id := uuid.New()
-			a.Db.Create(&database.PersistingStruct{
-				ID:   id,
-				Data: string(d.Body),
-			})
-			a.Cache.Set(ctx, id.String(), string(d.Body), 0)
-			log.Info().Msgf("Received a message: %s", d.Body)
+			body := string(d.Body)
+			persisted := &database.PersistingStruct{
+				ID:   uuid.New(),
+				Data: body,
+			}
+			a.Db.WithContext(ctx).Create(persisted)
+			err := a.Cache.Set(ctx, persisted.ID.String(), body, 0).Err()
+			if err != nil {
+				log.Error().Err(err).Msg("failed ot persist to cache")
+			}
+			data, err := a.Cache.Get(ctx, persisted.ID.String()).Result()
+			if err != nil {
+				log.Error().Err(err).Msg("failed to retrieve from cache")
+			}
+
+			encoded, _ := json.Marshal(persisted)
+			log.Info().Msgf("persisted in db: %s", encoded)
+			log.Info().Msgf("persisted in cache: %s", data)
 		}
 	}()
 
-	log.Info().Msgf("consuming from queue: %s", q.Name)
+	log.Info().Msgf("started consumer from queue: %s", q.Name)
 	<-k
 }

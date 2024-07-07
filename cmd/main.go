@@ -24,7 +24,7 @@ func main() {
 
 	app, err := server.New(cfg)
 	if err != nil {
-		panic(fmt.Errorf("Server error", err))
+		panic(fmt.Errorf("server error %v", err))
 	}
 
 	app.Init(ctx)

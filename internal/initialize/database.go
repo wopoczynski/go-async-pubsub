@@ -11,7 +11,7 @@ import (
 )
 
 type DBConfig struct {
-	DSN string `env:"URL"`
+	DSN string `env:"DSN"`
 }
 
 func DB(cfg DBConfig) (*gorm.DB, error) {
