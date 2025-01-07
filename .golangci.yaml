@@ -78,11 +78,6 @@ issues:
         - wrapcheck
         - errcheck
         - forbidigo
-    - path: internal/queue/handler/payment.go
-      linters: # @TODO remove after IA-486
-        - revive
-        - mnd
-        - unparam
 
 linters:
   disable-all: true
